@@ -8,12 +8,11 @@ import matplotlib.pyplot as plt
 
 
 main_window = tk.Tk()
-main_window.geometry("600x500")
+main_window.attributes("-fullscreen", True)
 main_window.title("Stock Reader v1.0")
 main_window.resizable(False, False) 
 
 
-current_price = None
 
 def get_stock_price(period, interval):
     stockname = stock_entry.get().strip().upper()
@@ -59,9 +58,13 @@ title_label.place(x=50,y=5)
 stock_entry = ttk.Entry(table_frame, width=30)
 stock_entry.place(x=50, y=30)
 
+graph_frame = ttk.Frame(main_window)
+graph_frame.place(x=610, y=0, width=1300, height=700)
+
+
 
 #Buttons
-oneday_button = tk.Button(table_frame, text="1d", command=lambda: get_stock_price("1d", "1h"), width=2, font=("Courier", 12))
+'''oneday_button = tk.Button(table_frame, text="1d", command=lambda: get_stock_price("1d", "1h"), width=2, font=("Courier", 12))
 oneday_button.place(x=340, y=30)
 week_button = tk.Button(table_frame, text="5d", command=lambda: get_stock_price("5d", "4h"), width=2, font=("Courier", 12))
 week_button.place(x=390, y=30)
@@ -76,7 +79,28 @@ oneyear_button.place(x=390, y=60)
 fiveyear_button = tk.Button(table_frame, text="5y", command=lambda: get_stock_price("5y", "3mo"), width=2, font=("Courier", 12))
 fiveyear_button.place(x=440, y=60)
 max_button = tk.Button(table_frame, text="Max", command=lambda: get_stock_price("max", "3mo"), width=2, font=("Courier", 12))
-max_button.place(x=490, y=60)
+max_button.place(x=490, y=60)'''
+
+# Buttons
+buttons = [
+    ("1d", "1d", "1h", 340, 30),
+    ("5d", "5d", "4h", 390, 30),
+    ("1mo", "1mo", "1d", 440, 30),
+    ("6mo", "6mo", "1wk", 490, 30),
+    ("YTD", "ytd", "1wk", 340, 60),
+    ("1yr", "1y", "1mo", 390, 60),
+    ("5y", "5y", "3mo", 440, 60),
+    ("Max", "max", "3mo", 490, 60)
+]
+
+for text, period, interval, x, y in buttons:
+    tk.Button(
+        table_frame, text=text, 
+        command=lambda period = period, interval = interval:get_stock_price(period, interval),
+        width=2, font=("Courier", 12)
+    ).place(x=x, y=y)
+
+
 
 
 
@@ -93,9 +117,6 @@ table_label.place(x=50, y=100)
 #August 6th: Added a function to retrieve stock data based on user input.
 #August 8th: Added a function to align the stock data for better readability, including a table that represented the stock data in a more structured format. Included data such as volume, open, and close 
 #August 9th: Added buttons to retrieve stock data for different periods (1d, 5d, 1mo, 3mo, 6mo, YTD, 1y, MAX) with appropriate intervals.
-
-#NEED TO ADD SCROLLWHEEL FOR DATA THAT IS TOO LONG TO FIT IN THE WINDOW (ESPECIALLY FOR YTD AND MAX)
-
 
 
 
