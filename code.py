@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
 
 
 main_window = tk.Tk()
@@ -47,7 +50,54 @@ def get_stock_price(period, interval):
     if current_price.empty:
         result_label.config(text=f"No data available for {stockname}.")
         return
+    
+    if period =="1d" and interval == "1h":
+        dates = current_price.index.strftime('%H:%M').to_numpy()
+        xlabel = current_price.index[-1].strftime("%Y-%m-%d")
+    elif period == "5d" and interval == "4h":
+        dates = current_price.index.strftime('%d %H:%M').to_numpy()
+        xlabel = current_price.index[-1].strftime("%Y %b")
+    elif period == "1mo" and interval == "1d":
+        dates = current_price.index.strftime('%d %b').to_numpy()
+        xlabel = current_price.index[-1].strftime("%Y")
+    elif period == "6mo" and interval == "1wk":
+        dates = current_price.index.strftime('%b %d').to_numpy()
+        xlabel = current_price.index[-1].strftime("%Y")
+    elif period == "ytd" and interval == "1wk":
+        dates = current_price.index.strftime('%b %d').to_numpy()
+        xlabel = current_price.index[-1].strftime("%Y")
+    elif period == "1y" and interval == "1mo":
+        dates = current_price.index.strftime('%Y %b').to_numpy()
+        xlabel = ""
+    elif period == "5y" and interval == "3mo":
+        dates = current_price.index.strftime('%Y-%b').to_numpy()
+        xlabel = ""
+    else:
+         dates = current_price.index.strftime('%Y-%m-%d').to_numpy()
+   
+    close_price = current_price['Close'].to_numpy()
 
+    #Canvas Structure
+    fig = Figure(figsize=(7, 5), dpi=100)
+    fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+    x = dates
+    y = close_price
+    
+
+    plot = fig.add_subplot(111)
+    plot.plot(x,y)
+    
+    plot.set_xlabel(xlabel)
+    plot.set_title(f"{stockname} Stock Price")
+    plot.tick_params(axis='x', rotation=90)
+    graph_canvas = FigureCanvasTkAgg(fig, master=graph_frame)
+
+    graph_canvas.draw()
+    
+    #toolbar = NavigationToolbar2Tk(graph_canvas, graph_frame)
+    #toolbar.update()
+
+    graph_canvas.get_tk_widget().place(x=0,y=0)
 
 
 #Widgets
@@ -59,27 +109,9 @@ stock_entry = ttk.Entry(table_frame, width=30)
 stock_entry.place(x=50, y=30)
 
 graph_frame = ttk.Frame(main_window)
-graph_frame.place(x=610, y=0, width=1300, height=700)
+graph_frame.place(x=550, y=30, width=1500, height=900)
 
 
-
-#Buttons
-'''oneday_button = tk.Button(table_frame, text="1d", command=lambda: get_stock_price("1d", "1h"), width=2, font=("Courier", 12))
-oneday_button.place(x=340, y=30)
-week_button = tk.Button(table_frame, text="5d", command=lambda: get_stock_price("5d", "4h"), width=2, font=("Courier", 12))
-week_button.place(x=390, y=30)
-onemonth_button = tk.Button(table_frame, text="1mo", command=lambda: get_stock_price("1mo", "1d"), width=2, font=("Courier", 12))
-onemonth_button.place(x=440, y=30)
-sixmonths_button = tk.Button(table_frame, text="6mo", command=lambda: get_stock_price("6mo", "1wk"), width=2, font=("Courier", 12))
-sixmonths_button.place(x=490, y=30)
-ytd_button = tk.Button(table_frame, text="YTD", command=lambda: get_stock_price("ytd", "1wk"), width=2, font=("Courier", 12))
-ytd_button.place(x=340, y=60)
-oneyear_button = tk.Button(table_frame, text="1yr", command=lambda: get_stock_price("1y", "1mo"), width=2, font=("Courier", 12))
-oneyear_button.place(x=390, y=60)
-fiveyear_button = tk.Button(table_frame, text="5y", command=lambda: get_stock_price("5y", "3mo"), width=2, font=("Courier", 12))
-fiveyear_button.place(x=440, y=60)
-max_button = tk.Button(table_frame, text="Max", command=lambda: get_stock_price("max", "3mo"), width=2, font=("Courier", 12))
-max_button.place(x=490, y=60)'''
 
 # Buttons
 buttons = [
