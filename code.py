@@ -47,6 +47,22 @@ def get_stock_price(period, interval):
     table_label.config(text=f"Price Data for {stockname}:\n{aligned_data}", font=("Courier", 12))
     print (current_price)
 
+    new_price = current_price['Close'].iloc[-1]
+    old_price = current_price['Close'].iloc[0]
+
+    if new_price > old_price:
+        percentage = ((new_price - old_price) / old_price) * 100
+        percentage.round(2)
+        result_label.config(text=f"Current Price of {stockname}: ${new_price:.2f}  ↑(+{percentage:.2f}%)", style="Green.TLabel")
+        
+    elif new_price < old_price:
+        percentage = ((old_price - new_price) / old_price) * 100
+        percentage.round(2)
+        result_label.config(text=f"Current Price of {stockname}: ${new_price:.2f}  ↓(-{percentage:.2f}%)", style="Red.TLabel")
+
+    else:
+        result_label.config(text=f"Current Price of {stockname}: ${new_price:.2f}", style="")
+
     if current_price.empty:
         result_label.config(text=f"No data available for {stockname}.")
         return
@@ -74,7 +90,7 @@ def get_stock_price(period, interval):
         xlabel = ""
     else:
          dates = current_price.index.strftime('%Y-%m-%d').to_numpy()
-   
+
     close_price = current_price['Close'].to_numpy()
 
     #Canvas Structure
@@ -137,7 +153,11 @@ for text, period, interval, x, y in buttons:
 
 
 #Labels
-result_label = ttk.Label(table_frame, text="")
+style = ttk.Style()
+style.configure("Red.TLabel", foreground="red",)
+style.configure("Green.TLabel", foreground="green",)
+
+result_label = ttk.Label(table_frame, text="",)
 result_label.place(x=50, y=70)    
 table_label = ttk.Label(table_frame, text="")
 table_label.place(x=50, y=100)
