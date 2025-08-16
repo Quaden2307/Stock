@@ -37,7 +37,7 @@ def get_stock_price(period, interval):
     if isinstance(current_price.columns, pd.MultiIndex):
         current_price.columns = current_price.columns.droplevel(1)
         
-#Label Formatting (Panda DataFrame Alignment)
+    #Label Formatting (Panda DataFrame Alignment)
     current_price_str = current_price.to_string(index=True, header=True, justify="right")
     lines = current_price_str.split('\n')
     max_len = max(len(line) for line in lines)
@@ -94,27 +94,45 @@ def get_stock_price(period, interval):
     close_price = current_price['Close'].to_numpy()
 
     #Canvas Structure
-    fig = Figure(figsize=(7, 5), dpi=100)
-    fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+    fig = Figure(figsize=(7, 8), dpi=100)
+    fig.subplots_adjust(left=0.15, right=0.9, top=0.9, bottom=0.27, hspace=0.5,)
     x = dates
     y = close_price
-    
 
-    plot = fig.add_subplot(111)
-    plot.plot(x,y)
+    volumeaxis = current_price['Volume'].to_numpy()
     
-    plot.set_xlabel(xlabel)
-    plot.set_title(f"{stockname} Stock Price")
-    plot.tick_params(axis='x', rotation=90)
-    graph_canvas = FigureCanvasTkAgg(fig, master=graph_frame)
+    if np.max(volumeaxis) > 1e9:
+        volumeaxis = volumeaxis / 1e9
+        volumelabel = "Volume (Billions)"
+    elif np.max(volumeaxis) > 1e6:
+        volumeaxis = volumeaxis / 1e6
+        volumelabel = "Volume (Millions)"
+    elif np.max(volumeaxis) > 1e3:
+        volumeaxis = volumeaxis / 1e3
+        volumelabel = "Volume (Thousands)"
 
-    graph_canvas.draw()
-    
-    #toolbar = NavigationToolbar2Tk(graph_canvas, graph_frame)
+    pplot = fig.add_subplot(211) #----------------> pplot = "price plot"
+
+    pplot.plot(x,y)
+    pplot.set_xlabel(xlabel)
+    pplot.set_ylabel("Price ($)")
+    pplot.set_title(f"{stockname} Stock Price")
+    pplot.tick_params(axis='x', rotation=90)
+    pplot.grid(True, linestyle='--', alpha=0.5)
+
+    vplot = fig.add_subplot(212) #----------------> vplot = "volume plot"
+
+    vplot.bar(x, volumeaxis, color='orange', width=0.5)
+    vplot.set_ylabel(volumelabel)
+    vplot.set_xlabel(xlabel)
+    vplot.tick_params(axis='x', rotation=90)
+
+    line_graph_canvas = FigureCanvasTkAgg(fig, master=graph_frame)
+    line_graph_canvas.draw()
+    line_graph_canvas.get_tk_widget().place(x=0,y=0)
+
+    #toolbar = NavigationToolbar2Tk(line_graph_canvas, graph_frame)
     #toolbar.update()
-
-    graph_canvas.get_tk_widget().place(x=0,y=0)
-
 
 #Widgets
 table_frame = ttk.Frame(main_window)
@@ -169,7 +187,8 @@ table_label.place(x=50, y=100)
 #August 6th: Added a function to retrieve stock data based on user input.
 #August 8th: Added a function to align the stock data for better readability, including a table that represented the stock data in a more structured format. Included data such as volume, open, and close 
 #August 9th: Added buttons to retrieve stock data for different periods (1d, 5d, 1mo, 3mo, 6mo, YTD, 1y, MAX) with appropriate intervals.
-
+#August 15th: Added a function to plot the stock data in a graph, as well as minor visual changes 
+#August 16th: Improved stock price grpahing function and added volume graph. 
 
 
 
