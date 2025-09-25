@@ -218,6 +218,27 @@ if get_stock_data:
                 st.pyplot(fig)
 
 
+st.header("Stock Options")
+if stockname:
+    stock = yf.Ticker(stockname)
+    options_dates = stock.options
+    if options_dates:
+        selected_option_date = st.selectbox("Select an option expiration date:", options_dates)
+        if selected_option_date:
+            option_chain = stock.option_chain(selected_option_date)
+            calls = option_chain.calls
+            puts = option_chain.puts
+
+            st.subheader(f"Call Options for {stockname} expiring on {selected_option_date}")
+            st.write(calls)
+
+            st.subheader(f"Put Options for {stockname} expiring on {selected_option_date}")
+            st.write(puts)
+    else:
+        st.info(f"No options data available for {stockname}.")  
+    
+
+
 
 
 
